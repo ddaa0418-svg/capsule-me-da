@@ -18,15 +18,7 @@ const IMAGE_EXTENSIONS: Record<string, string> = {
 };
 
 function getFirebaseStorage() {
-  const app = getFirebaseApp();
-  const bucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
-
-  if (!bucket) {
-    return getStorage(app);
-  }
-
-  const bucketUrl = bucket.startsWith("gs://") ? bucket : `gs://${bucket}`;
-  return getStorage(app, bucketUrl);
+  return getStorage(getFirebaseApp());
 }
 
 function getSafeExtension(file: File) {
