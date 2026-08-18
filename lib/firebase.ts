@@ -30,11 +30,23 @@ export function getFirebaseApp(): FirebaseApp {
 }
 
 export async function getFirebaseAnalytics(): Promise<Analytics | null> {
-  const { getAnalytics, isSupported } = await import("firebase/analytics");
+  const { getAnalytics, initializeAnalytics, isSupported } = await import(
+    "firebase/analytics"
+  );
 
   if (!(await isSupported())) {
     return null;
   }
 
-  return getAnalytics(getFirebaseApp());
+  const app = getFirebaseApp();
+
+  try {
+    return initializeAnalytics(app, {
+      config: {
+        send_page_view: false,
+      },
+    });
+  } catch {
+    return getAnalytics(app);
+  }
 }

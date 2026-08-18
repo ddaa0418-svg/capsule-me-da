@@ -50,3 +50,21 @@ export function formatCountdown(openAt: Date | null, now = new Date()) {
 
   return `${seconds}초 남음`;
 }
+
+export function formatDday(openAt: Date | null, now = new Date()) {
+  if (!openAt || openAt.getTime() <= now.getTime()) {
+    return "열림";
+  }
+
+  const days = Math.ceil((openAt.getTime() - now.getTime()) / 86_400_000);
+
+  if (days <= 0) {
+    return "오늘";
+  }
+
+  if (days === 1) {
+    return "내일";
+  }
+
+  return `D-${days}`;
+}

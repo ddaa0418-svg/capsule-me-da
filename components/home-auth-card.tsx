@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import CapsuleDashboard from "@/components/capsule-dashboard";
 import ForestPage from "@/components/forest-page";
+import { useLiveWeather } from "@/lib/use-live-weather";
+import { trackEvent } from "@/lib/gtag";
 import {
   getGoogleSignInErrorMessage,
   signInWithGoogle,
@@ -17,6 +19,7 @@ export default function HomeAuthCard() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const signingInRef = useRef(false);
+  const weather = useLiveWeather();
 
   useEffect(() => {
     try {
@@ -39,6 +42,7 @@ export default function HomeAuthCard() {
 
     try {
       await signInWithGoogle();
+      trackEvent("login", { method: "google" });
       setError(null);
     } catch (signInError) {
       setError(getGoogleSignInErrorMessage(signInError));
@@ -63,8 +67,8 @@ export default function HomeAuthCard() {
   return user ? (
     <CapsuleDashboard user={user} pending={pending} onSignOut={handleSignOut} />
   ) : (
-    <ForestPage className="flex items-center justify-center px-6">
-      <main className="card-wood w-full max-w-lg rounded-3xl px-10 py-16 text-center">
+    <ForestPage weather={weather} className="flex items-center justify-center px-6">
+      <main className="card-glass w-full max-w-lg rounded-3xl px-10 py-16 text-center">
         <p className="text-xs font-medium tracking-[0.28em] text-wood">FOREST CAPSULE</p>
         <h1 className="mt-4 text-5xl font-semibold tracking-tight text-cream sm:text-6xl">
           캡슐미

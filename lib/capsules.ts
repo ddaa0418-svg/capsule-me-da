@@ -14,6 +14,8 @@ import {
 } from "firebase/firestore";
 import { getFirebaseApp } from "@/lib/firebase";
 import { deleteCapsulePhotos, type CapsulePhoto } from "@/lib/storage";
+import { isCapsuleMood, type CapsuleMood } from "@/lib/capsule-mood";
+import { isCapsuleWeather, type CapsuleWeather } from "@/lib/weather";
 
 export type Capsule = {
   id: string;
@@ -23,6 +25,8 @@ export type Capsule = {
   openAt: Date | null;
   photos: CapsulePhoto[];
   createdAt: Date | null;
+  weather: CapsuleWeather | null;
+  mood: CapsuleMood | null;
 };
 
 export type CreateCapsuleInput = {
@@ -31,6 +35,8 @@ export type CreateCapsuleInput = {
   letter: string;
   openAt: string;
   photos: CapsulePhoto[];
+  weather?: CapsuleWeather | null;
+  mood?: CapsuleMood | null;
 };
 
 function getDb() {
@@ -70,6 +76,14 @@ function toPhotos(value: unknown): CapsulePhoto[] {
   });
 }
 
+function toWeather(value: unknown): CapsuleWeather | null {
+  return isCapsuleWeather(value) ? value : null;
+}
+
+function toMood(value: unknown): CapsuleMood | null {
+  return isCapsuleMood(value) ? value : null;
+}
+
 function toCapsule(id: string, data: DocumentData): Capsule {
   return {
     id,
@@ -79,6 +93,8 @@ function toCapsule(id: string, data: DocumentData): Capsule {
     openAt: toDate(data.openAt),
     photos: toPhotos(data.photos),
     createdAt: toDate(data.createdAt),
+    weather: toWeather(data.weather),
+    mood: toMood(data.mood),
   };
 }
 
@@ -89,6 +105,8 @@ export async function createCapsule(input: CreateCapsuleInput) {
     letter: input.letter,
     openAt: input.openAt ? Timestamp.fromDate(new Date(input.openAt)) : null,
     photos: input.photos,
+    weather: input.weather ?? null,
+    mood: input.mood ?? null,
     createdAt: serverTimestamp(),
   });
 

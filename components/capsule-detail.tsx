@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { SealedCapsuleMark } from "@/components/capsule-mark";
+import { CapsuleKeywords, CapsuleQuote, OpenedCapsuleMark, SealedCapsuleMark } from "@/components/capsule-mark";
 import ForestPage from "@/components/forest-page";
 import { deleteCapsule, getCapsule, type Capsule } from "@/lib/capsules";
 import { formatCountdown, isCapsuleOpen, useNow } from "@/lib/countdown";
+import { CapsuleWeatherCard } from "@/components/capsule-weather";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -58,8 +59,8 @@ export default function CapsuleDetail({ id }: { id: string }) {
   const showContents = open || previewOpen;
 
   return (
-    <ForestPage className="flex items-center justify-center px-6 py-16">
-      <main className="card-wood w-full max-w-xl rounded-[2rem] px-8 py-12 sm:px-12">
+    <ForestPage weather={capsule?.weather ?? null} className="flex items-center justify-center px-6 py-16">
+      <main className="card-glass w-full max-w-xl rounded-[2rem] px-8 py-12 sm:px-12">
         {!ready ? (
           <p className="text-center text-sm text-cream-dim/70">캡슐을 여는 중...</p>
         ) : capsule ? (
@@ -131,7 +132,16 @@ function LockedCapsule({
 }) {
   return (
     <div className="mt-10 w-full">
-      <div className="relative overflow-hidden rounded-[2rem] border border-wood/15 bg-gradient-to-b from-[#f4f1e4] via-[#e5eed6] to-[#c9d9b0] px-6 py-12">
+      <div
+        className="relative overflow-hidden rounded-[2rem] border border-white/30 bg-white/25 px-6 py-12 backdrop-blur-md"
+        style={
+          capsule.mood
+            ? {
+                background: `linear-gradient(to bottom, ${capsule.mood.style.mistFrom}cc, ${capsule.mood.style.mistTo}99)`,
+              }
+            : undefined
+        }
+      >
         <div className="pointer-events-none absolute -left-12 -top-10 h-40 w-40 rounded-full bg-leaf/20 blur-3xl" />
         <div className="pointer-events-none absolute -right-10 bottom-0 h-36 w-36 rounded-full bg-wood/15 blur-3xl" />
         <span className="firefly firefly-a" />
@@ -142,12 +152,22 @@ function LockedCapsule({
           <span className="absolute inset-0 rounded-full border border-wood/20" />
           <span className="absolute inset-3 rounded-full border border-dashed border-leaf/30" />
           <span className="capsule-float">
-            <SealedCapsuleMark size={92} />
+            <SealedCapsuleMark size={92} style={capsule.mood?.style} />
           </span>
         </div>
         <p className="relative mt-6 text-xl font-semibold text-cream">숲에서 잠드는 중</p>
-        <p className="relative mt-3 text-sm leading-relaxed text-cream-dim">
-          열람일이 되어야 사진과 편지를 볼 수 있어요
+        {capsule.mood?.quote ? (
+          <div className="relative mt-4">
+            <CapsuleQuote quote={capsule.mood.quote} />
+          </div>
+        ) : null}
+        {capsule.mood?.keywords.length ? (
+          <div className="relative mt-4 flex justify-center">
+            <CapsuleKeywords keywords={capsule.mood.keywords} className="justify-center" />
+          </div>
+        ) : null}
+        <p className="relative mt-5 text-sm leading-relaxed text-cream-dim">
+          열람일이 되어야 사진과 편지를 볼 수 있어요. 그날의 하늘은 이미 캡슐을 감싸고 있어요.
         </p>
         <p className="relative mt-6 text-2xl font-semibold tracking-tight text-wood">
           {formatCountdown(capsule.openAt, now)}
@@ -158,6 +178,8 @@ function LockedCapsule({
           </p>
         ) : null}
       </div>
+
+      <CapsuleWeatherCard weather={capsule.weather} className="mt-6" />
 
       {isDev ? (
         <button
@@ -187,6 +209,15 @@ function OpenedCapsule({
         <p className="mb-6 text-sm font-medium text-wood">지금 열 수 있어요</p>
       )}
 
+      {capsule.mood ? (
+        <div className="mb-8 flex flex-col items-center gap-3">
+          <OpenedCapsuleMark size={72} style={capsule.mood.style} />
+          <p className="text-xs font-medium tracking-wide text-wood">그날의 한마디</p>
+          <CapsuleQuote quote={capsule.mood.quote} />
+          <CapsuleKeywords keywords={capsule.mood.keywords} className="justify-center" />
+        </div>
+      ) : null}
+
       {capsule.photos.length > 0 ? (
         <div className="flex flex-wrap justify-center gap-3">
           {capsule.photos.map((photo) => (
@@ -213,6 +244,8 @@ function OpenedCapsule({
       ) : (
         <p className="mt-8 text-sm text-cream-dim/70">담긴 편지가 없어요</p>
       )}
+
+      <CapsuleWeatherCard weather={capsule.weather} className="mt-6" />
 
       {capsule.openAt ? (
         <p className="mt-6 text-xs text-cream-dim/70">

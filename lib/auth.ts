@@ -70,8 +70,12 @@ export function getGoogleSignInErrorMessage(error: unknown) {
     case "auth/popup-blocked":
     case "auth/operation-not-supported-in-this-environment":
       return "팝업이 차단되어 로그인할 수 없습니다. Chrome이나 Edge에서 http://localhost:3000 을 직접 열어주세요.";
-    case "auth/unauthorized-domain":
-      return "이 도메인은 Firebase 인증에 허용되지 않았습니다. 콘솔의 승인된 도메인을 확인해주세요.";
+    case "auth/unauthorized-domain": {
+      const host = typeof window !== "undefined" ? window.location.hostname : "";
+      return host
+        ? `이 주소(${host})는 Firebase 인증에 허용되지 않았습니다. 콘솔 → Authentication → Settings → Authorized domains에 추가해주세요.`
+        : "이 도메인은 Firebase 인증에 허용되지 않았습니다. 콘솔의 승인된 도메인을 확인해주세요.";
+    }
     case "auth/invalid-api-key":
     case "auth/api-key-not-valid.-please-pass-a-valid-api-key.":
       return "Firebase API 키가 없습니다. .env 파일을 저장한 뒤 개발 서버를 다시 시작해주세요.";

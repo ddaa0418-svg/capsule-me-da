@@ -10,6 +10,7 @@
     "tree": "treee -I \"node_modules|.git|.next\" --dirs-first -S"
   },
   "dependencies": {
+    "@google/genai": "^2.17.1",
     "firebase": "^12.17.1",
     "next": "16.3.1",
     "react": "19.2.8",

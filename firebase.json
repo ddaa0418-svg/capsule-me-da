@@ -1,0 +1,14 @@
+{
+  "auth": {
+    "providers": {
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "캡슐미",
+        "supportEmail": "ddaa0418@gmail.com",
+        "authorizedRedirectUris": [
+          "https://capsule-me-da.vercel.app/__/auth/handler",
+          "https://dahye-94990.firebaseapp.com/__/auth/handler"
+        ]
+      }
+    }
+  }
+}
